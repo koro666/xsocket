@@ -1,0 +1,12 @@
+#pragma once
+#include <errno.h>
+#include <stdalign.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <sys/param.h>
+#include <sys/un.h>
+#include <unistd.h>
