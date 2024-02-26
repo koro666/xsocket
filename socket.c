@@ -1,6 +1,60 @@
 #include "system.h"
 #include "socket.h"
 
+int check_socket(fd_t sockfd, int* domain, int* type, int* protocol)
+{
+	socklen_t length;
+
+	*domain = 0;
+	*type = 0;
+	*protocol = 0;
+
+	length = sizeof(int);
+	if (getsockopt(sockfd, SOL_SOCKET, SO_DOMAIN, domain, &length) < 0)
+		return -1;
+
+	if (*domain != AF_INET && *domain != AF_INET6)
+		return 0;
+
+	length = sizeof(int);
+	if (getsockopt(sockfd, SOL_SOCKET, SO_TYPE, type, &length) < 0)
+		return -1;
+
+	if (*type != SOCK_STREAM && *type != SOCK_DGRAM)
+		return 0;
+
+	length = sizeof(int);
+	if (getsockopt(sockfd, SOL_SOCKET, SO_PROTOCOL, protocol, &length) < 0)
+		return -1;
+
+	if (*protocol != IPPROTO_TCP && *protocol != IPPROTO_UDP)
+		return 0;
+
+	return 1;
+}
+
+bool check_address(const struct sockaddr* address, socklen_t addrlen, const in_port_t* ports, ssize_t nports)
+{
+	in_port_t port;
+	if (address->sa_family == AF_INET && addrlen >= sizeof(struct sockaddr_in))
+		port = ntohs(((struct sockaddr_in*)address)->sin_port);
+	else if (address ->sa_family == AF_INET && addrlen >= sizeof(struct sockaddr_in6))
+		port = ntohs(((struct sockaddr_in6*)address)->sin6_port);
+	else
+		return false;
+
+	if (nports < 0)
+		return true;
+
+	for (ssize_t i = 0; i < nports; ++i)
+	{
+		if (ports[i] == port)
+			return true;
+	}
+
+	return false;
+}
+
 void to_sockaddr_un(const char* name, struct sockaddr_un* sun)
 {
 	memset(sun, 0, sizeof(struct sockaddr_un));
@@ -45,7 +99,7 @@ ssize_t send_packet(fd_t sockfd, const void* data, size_t size, fd_t sendfd)
 		struct cmsghdr* cmsg = CMSG_FIRSTHDR(&msg);
 		cmsg->cmsg_level = SOL_SOCKET;
 		cmsg->cmsg_type = SCM_RIGHTS;
-		cmsg->cmsg_len = sizeof(fd_t);
+		cmsg->cmsg_len = CMSG_LEN(sizeof(fd_t));
 		memcpy(CMSG_DATA(cmsg), &sendfd, sizeof(fd_t));
 	}
 

@@ -1,0 +1,25 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+	{
+		"name": "Hook",
+		"type": "cppdbg",
+		"request": "launch",
+		"program": "/usr/bin/nc",
+		"args": ["-vv", "-l", "-s", "127.0.0.1", "-p", "3000"],
+		"cwd": "${workspaceFolder}",
+		"environment": [
+			{ "name": "LD_PRELOAD", "value": "${workspaceFolder}/builddir/libxbind.so" },
+			{ "name": "XSOCKET", "value": "@xsocket" },
+			{ "name": "XBIND", "value": "3000" }
+		]
+	},
+	{
+		"name": "Server",
+		"type": "cppdbg",
+		"request": "launch",
+		"program": "${workspaceFolder}/builddir/xsocket-server",
+		"args": ["@xsocket"],
+		"cwd": "${workspaceFolder}"
+	}]
+}
