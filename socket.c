@@ -38,7 +38,7 @@ bool check_address(const struct sockaddr* address, socklen_t addrlen, const in_p
 	in_port_t port;
 	if (address->sa_family == AF_INET && addrlen >= sizeof(struct sockaddr_in))
 		port = ntohs(((struct sockaddr_in*)address)->sin_port);
-	else if (address ->sa_family == AF_INET && addrlen >= sizeof(struct sockaddr_in6))
+	else if (address ->sa_family == AF_INET6 && addrlen >= sizeof(struct sockaddr_in6))
 		port = ntohs(((struct sockaddr_in6*)address)->sin6_port);
 	else
 		return false;

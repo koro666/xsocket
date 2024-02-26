@@ -10,7 +10,7 @@ project(
 
 add_project_arguments('-D_GNU_SOURCE', language: 'c')
 
-if get_option('buildtype') == 'debug'
+if get_option('debug')
 	add_project_arguments('-D_DEBUG', language: 'c')
 endif
 
