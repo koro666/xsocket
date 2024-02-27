@@ -6,7 +6,7 @@ project(
 		'warning_level': '1',
 		'strip': true
 	},
-	version: '0.3')
+	version: '0.8')
 
 add_project_arguments('-D_GNU_SOURCE', language: 'c')
 
@@ -14,8 +14,12 @@ if get_option('debug')
 	add_project_arguments('-D_DEBUG', language: 'c')
 endif
 
-install_headers('xsocket.h')
-install_data('xsocket.service', install_dir: get_option('libdir') / 'systemd' / 'system')
+install_headers('xsocket.h',
+	follow_symlinks: true)
+
+install_data('xsocket.service',
+	follow_symlinks: true,
+	install_dir: get_option('libdir') / 'systemd' / 'system')
 
 xsocket_common = static_library(
 	'xsocket_common',
