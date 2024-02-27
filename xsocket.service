@@ -1,0 +1,24 @@
+[Unit]
+Description=xsocket server
+
+[Service]
+Type=exec
+DynamicUser=true
+ExecStart=/usr/bin/xsocket-server
+
+RuntimeDirectory=xsocket
+RuntimeDirectoryMode=0750
+
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=tmpfs
+PrivateDevices=true
+ProtectProc=noaccess
+
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+MemoryDenyWriteExecute=true
+SystemCallFilter=@basic-io @network-io @signal @io-event @process @file-system
+SystemCallArchitectures=native
+
+[Install]
+WantedBy=multi-user.target

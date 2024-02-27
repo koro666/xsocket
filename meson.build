@@ -15,6 +15,7 @@ if get_option('debug')
 endif
 
 install_headers('xsocket.h')
+install_data('xsocket.service', install_dir: get_option('libdir') / 'systemd' / 'system')
 
 xsocket_common = static_library(
 	'xsocket_common',
