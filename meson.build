@@ -33,6 +33,7 @@ xsocket_library = shared_library(
 shared_library(
 	'xbind',
 	'hook.c',
+	'switch.c',
 	gnu_symbol_visibility: 'hidden',
 	link_with: [xsocket_common, xsocket_library],
 	install: true)

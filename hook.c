@@ -4,6 +4,7 @@
 #include "socket.h"
 #include "protocol.h"
 #include "xsocket.h"
+#include "switch.h"
 
 char* xsocket_address;
 ssize_t xb_nport;
@@ -69,13 +70,24 @@ int bind(fd_t sockfd, const struct sockaddr* address, socklen_t addrlen)
 	if (!check || !check_address(address, addrlen, xb_ports, xb_nport))
 		return xbind_forward(sockfd, address, addrlen);
 
-	AUTO_CLOSE fd_t newfd = xsocket(xsocket_address, domain, type|SOCK_CLOEXEC, protocol);
+	type |= SOCK_CLOEXEC;
+
+	int flags = fcntl(sockfd, F_GETFL, 0);
+	if (flags < 0)
+		return -1;
+
+	if (flags & O_NONBLOCK)
+		type |= SOCK_NONBLOCK;
+
+	AUTO_CLOSE fd_t newfd = xsocket(xsocket_address, domain, type, protocol);
 	if (newfd < 0)
 		return -1;
 
-	// TODO:
-	errno = ENOTSUP;
-	return -1;
+	if (!switcheroo(sockfd, newfd))
+		return -1;
+
+	close_p(&newfd);
+	return xbind_forward(sockfd, address, addrlen);
 }
 
 int xbind_forward(fd_t sockfd, const struct sockaddr* address, socklen_t addrlen)
