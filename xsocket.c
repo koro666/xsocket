@@ -7,6 +7,9 @@
 __attribute__((visibility("default")))
 int xsocket(const char* server, int domain, int type, int protocol)
 {
+	if (!server)
+		server = xsocket_default_address;
+
 	AUTO_CLOSE fd_t srvfd = socket(AF_UNIX, SOCK_SEQPACKET|SOCK_CLOEXEC, 0);
 	if (srvfd < 0)
 		return -1;

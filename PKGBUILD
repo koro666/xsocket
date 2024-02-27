@@ -1,9 +1,10 @@
 pkgname='xsocket'
-pkgver=0.8
+pkgver=0.9
 pkgrel=1
 pkgdesc='Cross-namespace socket library'
 arch=('x86_64' 'i686' 'aarch64' 'armv7h')
 makedepends=('meson')
+optdepends=('python: python support')
 source=(
 	'meson.build'
 	'system.h'
@@ -22,6 +23,7 @@ source=(
 	'server.c'
 	'server.h'
 	'xsocket.service'
+	'xsocket.py'
 )
 sha256sums=(
 	'SKIP'
@@ -41,7 +43,23 @@ sha256sums=(
 	'SKIP'
 	'SKIP'
 	'SKIP'
+	'SKIP'
 )
+
+prepare() {
+	local _src
+	local _dst
+
+	for _src in "${source[@]}"
+	do
+		if [[ -L "$_src" ]]
+		then
+			_dst=$(readlink "$_src")
+			unlink "$_src"
+			ln -- "$_dst" "$_src"
+		fi
+	done
+}
 
 build() {
 	arch-meson build

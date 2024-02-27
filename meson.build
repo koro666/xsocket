@@ -6,7 +6,7 @@ project(
 		'warning_level': '1',
 		'strip': true
 	},
-	version: '0.8')
+	version: '0.9')
 
 add_project_arguments('-D_GNU_SOURCE', language: 'c')
 
@@ -14,11 +14,9 @@ if get_option('debug')
 	add_project_arguments('-D_DEBUG', language: 'c')
 endif
 
-install_headers('xsocket.h',
-	follow_symlinks: true)
+install_headers('xsocket.h')
 
 install_data('xsocket.service',
-	follow_symlinks: true,
 	install_dir: get_option('libdir') / 'systemd' / 'system')
 
 xsocket_common = static_library(
@@ -49,3 +47,9 @@ executable(
 	gnu_symbol_visibility: 'hidden',
 	link_with: xsocket_common,
 	install: true)
+
+python = import('python').find_installation('python3', required: false)
+
+if python.found() and python.language_version().version_compare('>=3.11')
+	python.install_sources('xsocket.py')
+endif

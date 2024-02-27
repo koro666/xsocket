@@ -2,7 +2,7 @@
 
 `xsocket` is a set of tools to allow processes from isolated network namespaces to create sockets into other network namespaces without needing to call `setns` which requires elevated privileges.
 
-It works by forwarding the request to create a socket to a small server process which run in the desired target namespace.
+It works by forwarding the request to create a socket to a small server process which runs in the desired target namespace.
 
 ## Build
 
@@ -32,7 +32,7 @@ There are two main ways to use this tool.
 int xsocket(const char* path, int domain, int type, int, protocol);
 ```
 
-The `path` parameter is the filesystem path to the server socket, in the same format as specified to `xsocket-server`.
+The `path` parameter is the filesystem path to the server socket, in the same format as specified to `xsocket-server`. If set to `NULL`, it will use the default path.
 
 The three remaining parameters have the same meaning as with `socket (2)`.
 
