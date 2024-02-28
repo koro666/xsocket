@@ -5,3 +5,4 @@ __pycache__
 pkg
 src
 *.pkg.*
+*.tar
