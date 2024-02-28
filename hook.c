@@ -15,7 +15,7 @@ __attribute__((constructor))
 void xbind_initialize(void)
 {
 	const char* value = getenv("XSOCKET");
-	xsocket_address = strdup(value && *value ? value : xsocket_default_address);
+	xsocket_address = value && *value ? strdup(value) : NULL;
 
 	value = getenv("XBIND");
 	if (!value || !*value)
