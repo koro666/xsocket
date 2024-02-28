@@ -5,3 +5,5 @@
 !/*.h
 !/*.py
 !/*.service
+!/*.sysusers
+!/*.tmpfiles

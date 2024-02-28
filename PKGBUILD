@@ -24,9 +24,13 @@ source=(
 	'server.c'
 	'server.h'
 	'xsocket.service'
+	'xsocket.sysusers'
+	'xsocket.tmpfiles'
 	'xsocket.py'
 )
 sha256sums=(
+	'SKIP'
+	'SKIP'
 	'SKIP'
 	'SKIP'
 	'SKIP'

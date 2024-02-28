@@ -16,8 +16,26 @@ endif
 
 install_headers('xsocket.h')
 
-install_data('xsocket.service',
-	install_dir: get_option('libdir') / 'systemd' / 'system')
+systemd = dependency('systemd', required: false)
+libsystemd = dependency('libsystemd', required: false)
+python = import('python').find_installation('python3', required: false)
+
+if systemd.found()
+	install_data('xsocket.service',
+		install_dir: systemd.get_pkgconfig_variable('systemd_system_unit_dir'))
+
+	install_data('xsocket.sysusers',
+		install_dir: systemd.get_pkgconfig_variable('sysusers_dir'),
+		rename: 'xsocket.conf')
+
+	install_data('xsocket.tmpfiles',
+		install_dir: systemd.get_pkgconfig_variable('tmpfiles_dir'),
+		rename: 'xsocket.conf')
+endif
+
+if libsystemd.found()
+	add_project_arguments('-DXSOCKET_SYSTEMD', language: 'c')
+endif
 
 xsocket_common = static_library(
 	'xsocket_common',
@@ -44,11 +62,10 @@ shared_library(
 executable(
 	'xsocket-server',
 	'server.c',
+	dependencies: libsystemd,
 	gnu_symbol_visibility: 'hidden',
 	link_with: xsocket_common,
 	install: true)
-
-python = import('python').find_installation('python3', required: false)
 
 if python.found() and python.language_version().version_compare('>=3.11')
 	python.install_sources('xsocket.py')

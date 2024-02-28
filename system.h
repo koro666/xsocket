@@ -12,8 +12,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/param.h>
 #include <sys/signalfd.h>
 #include <sys/socket.h>
-#include <sys/param.h>
 #include <sys/un.h>
+#ifdef XSOCKET_SYSTEMD
+#include <systemd/sd-daemon.h>
+#endif
 #include <unistd.h>

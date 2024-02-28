@@ -2,12 +2,11 @@
 Description=xsocket server
 
 [Service]
-Type=exec
-DynamicUser=true
+Type=notify
+User=xsocket
 ExecStart=/usr/bin/xsocket-server
-
-RuntimeDirectory=xsocket
-RuntimeDirectoryMode=0750
+NotifyAccess=main
+UMask=0027
 
 NoNewPrivileges=true
 ProtectSystem=full

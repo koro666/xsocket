@@ -21,6 +21,10 @@ int main(int argc, char** argv)
 	if (!xs_setup_socket(argc, argv, &address, &srvfd, &path))
 		return EXIT_FAILURE;
 
+#if XSOCKET_SYSTEMD
+	sd_notify(0, "READY=1");
+#endif
+
 	bool parent = true;
 	uint32_t signo = 0;
 
@@ -56,6 +60,11 @@ int main(int argc, char** argv)
 		if (split < 0)
 			return EXIT_FAILURE;
 	}
+
+#if XSOCKET_SYSTEMD
+	if (parent)
+		sd_notify(0, "STOPPING=1");
+#endif
 
 	return !signo || signo == SIGTERM ? EXIT_SUCCESS : EXIT_FAILURE;
 }

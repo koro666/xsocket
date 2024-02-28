@@ -54,7 +54,6 @@ For systemd services, an add-on file (`/etc/systemd/system/servicename.d/xbind.c
 
 ```
 [Service]
-ExecStartPre=+/usr/bin/setfacl -n -m u:serviceuser:rx,m::rwx %t/xsocket
 ExecStartPre=+/usr/bin/setfacl -n -m u:serviceuser:rwx,m::rwx %t/xsocket/default
 Environment=LD_PRELOAD=libxbind.so
 Environment=XBIND=1234
