@@ -53,6 +53,10 @@ LD_PRELOAD=libxbind.so XBIND=3000 nc -l -p 3000
 For systemd services, an add-on file (`/etc/systemd/system/servicename.d/xbind.conf`) can be used to configure specific listening ports:
 
 ```
+[Unit]
+Requires=xsocket.service
+After=xsocket.service
+
 [Service]
 ExecStartPre=+/usr/bin/setfacl -n -m u:serviceuser:rwx,m::rwx %t/xsocket/default
 Environment=LD_PRELOAD=libxbind.so
