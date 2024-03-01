@@ -3,7 +3,7 @@ import os as _os
 import socket as _socket
 import typing as _typing
 
-__version__ = '0.9'
+__version__ = '1.0'
 __all__ = ['xsocket']
 
 _libxsocket = _ctypes.CDLL('libxsocket.so', use_errno=True)

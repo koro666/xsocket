@@ -6,7 +6,10 @@ Type=notify
 User=xsocket
 ExecStart=/usr/bin/xsocket-server
 NotifyAccess=main
-UMask=0027
+
+RuntimeDirectory=xsocket
+RuntimeDirectoryMode=0750
+RuntimeDirectoryPreserve=true
 
 NoNewPrivileges=true
 ProtectSystem=full
@@ -16,7 +19,7 @@ ProtectProc=noaccess
 
 RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
 MemoryDenyWriteExecute=true
-SystemCallFilter=@basic-io @network-io @signal @io-event @process @file-system
+SystemCallFilter=@basic-io @network-io @signal @io-event @process @file-system umask
 SystemCallArchitectures=native
 
 [Install]

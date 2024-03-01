@@ -113,7 +113,11 @@ bool xs_setup_socket(int argc, char* const* argv, struct sockaddr_un* address, f
 		return false;
 	}
 
-	if (bind(fd, (struct sockaddr*)address, addrlen) < 0)
+	mode_t mask = umask(0);
+	int result = bind(fd, (struct sockaddr*)address, addrlen);
+	umask(mask);
+
+	if (result < 0)
 	{
 		perror("bind");
 		return false;

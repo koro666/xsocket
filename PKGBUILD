@@ -1,5 +1,5 @@
 pkgname='xsocket'
-pkgver=0.9
+pkgver=1.0
 pkgrel=1
 pkgdesc='Cross-namespace socket library'
 arch=('x86_64' 'i686' 'aarch64' 'armv7h')
@@ -25,11 +25,9 @@ source=(
 	'server.h'
 	'xsocket.service'
 	'xsocket.sysusers'
-	'xsocket.tmpfiles'
 	'xsocket.py'
 )
 sha256sums=(
-	'SKIP'
 	'SKIP'
 	'SKIP'
 	'SKIP'

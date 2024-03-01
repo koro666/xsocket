@@ -15,6 +15,7 @@
 #include <sys/param.h>
 #include <sys/signalfd.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <sys/un.h>
 #ifdef XSOCKET_SYSTEMD
 #include <systemd/sd-daemon.h>

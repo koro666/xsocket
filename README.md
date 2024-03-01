@@ -54,11 +54,11 @@ For systemd services, an add-on file (`/etc/systemd/system/servicename.d/xbind.c
 
 ```
 [Unit]
-Requires=xsocket.service
+Wants=xsocket.service
 After=xsocket.service
 
 [Service]
-ExecStartPre=+/usr/bin/setfacl -n -m u:serviceuser:rwx,m::rwx %t/xsocket/default
+ExecStartPre=+/usr/bin/setfacl -n -m u:serviceuser:rwx,m::rwx %t/xsocket
 Environment=LD_PRELOAD=libxbind.so
 Environment=XBIND=1234
 ```

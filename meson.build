@@ -6,7 +6,7 @@ project(
 		'warning_level': '1',
 		'strip': true
 	},
-	version: '0.9')
+	version: '1.0')
 
 add_project_arguments('-D_GNU_SOURCE', language: 'c')
 
@@ -26,10 +26,6 @@ if systemd.found()
 
 	install_data('xsocket.sysusers',
 		install_dir: systemd.get_pkgconfig_variable('sysusers_dir'),
-		rename: 'xsocket.conf')
-
-	install_data('xsocket.tmpfiles',
-		install_dir: systemd.get_pkgconfig_variable('tmpfiles_dir'),
 		rename: 'xsocket.conf')
 endif
 
