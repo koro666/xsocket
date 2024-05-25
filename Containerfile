@@ -10,12 +10,12 @@ FROM archlinux:latest AS archlinux
 RUN \
 --mount=type=cache,id=pacman,target=/var/cache/pacman/pkg \
 --mount=type=cache,id=pacman.db,target=/var/lib/pacman/sync \
-pacman -Su --noconfirm && \
-pacman -S --noconfirm archlinux-keyring && \
 pacman -Sy --noconfirm && \
+pacman -S --noconfirm archlinux-keyring && \
+pacman -Su --noconfirm && \
 pacman -S --noconfirm base-devel python meson
 
-FROM alpine:3.19 AS alpine
+FROM alpine:3.20 AS alpine
 
 RUN \
 --mount=type=cache,id=apk,target=/etc/apk/cache \
