@@ -22,10 +22,10 @@ python = import('python').find_installation('python3', required: false)
 
 if systemd.found()
 	install_data('xsocket.service',
-		install_dir: systemd.get_pkgconfig_variable('systemd_system_unit_dir'))
+		install_dir: systemd.get_variable(pkgconfig: 'systemd_system_unit_dir'))
 
 	install_data('xsocket.sysusers',
-		install_dir: systemd.get_pkgconfig_variable('sysusers_dir'),
+		install_dir: systemd.get_variable(pkgconfig: 'sysusers_dir'),
 		rename: 'xsocket.conf')
 endif
 
