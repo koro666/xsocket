@@ -6,7 +6,7 @@ project(
 		'warning_level': '1',
 		'strip': true
 	},
-	version: '1.0')
+	version: '1.1')
 
 add_project_arguments('-D_GNU_SOURCE', language: 'c')
 
