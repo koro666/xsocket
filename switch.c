@@ -26,7 +26,7 @@ int setsockopt(fd_t fd, int level, int optname, const void* optval, socklen_t op
 	if (result < 0)
 		return result;
 
-	if (optname > XS_SW_MAXOPTNAME)
+	if (optname >= XS_SW_MAXOPTNAME)
 		return result;
 
 	const size_t count = sizeof(sw_optmap) / sizeof(struct xs_sw_optmap);

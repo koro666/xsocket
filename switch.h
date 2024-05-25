@@ -10,8 +10,8 @@ struct xs_sw_optmap
 };
 
 #define XS_SW_MAXOPTNAME 256
-#define XS_SW_OPTARRSIZE (XS_SW_MAXOPTNAME / sizeof(xs_sw_bitarray))
 #define XS_SW_ARRINDBITS (sizeof(xs_sw_bitarray) * 8)
+#define XS_SW_OPTARRSIZE (XS_SW_MAXOPTNAME / XS_SW_ARRINDBITS)
 
 extern volatile xs_sw_bitarray sw_opt_socket[XS_SW_OPTARRSIZE];
 extern volatile xs_sw_bitarray sw_opt_ip[XS_SW_OPTARRSIZE];
