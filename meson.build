@@ -63,6 +63,6 @@ executable(
 	link_with: xsocket_common,
 	install: true)
 
-if python.found() and python.language_version().version_compare('>=3.11')
+if python.found() and python.language_version().version_compare('>=3.12')
 	python.install_sources('xsocket.py')
 endif
