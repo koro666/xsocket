@@ -19,6 +19,8 @@ source=(
 	'xsocket.h'
 	'hook.c'
 	'hook.h'
+	'option.c'
+	'option.h'
 	'switch.c'
 	'switch.h'
 	'server.c'
@@ -28,6 +30,8 @@ source=(
 	'xsocket.py'
 )
 sha256sums=(
+	'SKIP'
+	'SKIP'
 	'SKIP'
 	'SKIP'
 	'SKIP'
