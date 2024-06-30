@@ -13,10 +13,10 @@ _xsocket.argtypes = [_ctypes.c_char_p, _ctypes.c_int, _ctypes.c_int, _ctypes.c_i
 _xsocket.restype = _ctypes.c_int
 
 def xsocket(
-	path: _typing.Union[_typing.AnyStr, _os.PathLike[_typing.AnyStr], None],
-	domain: _typing.Union[_socket.AddressFamily, int],
-	type: _typing.Union[_socket.SocketKind, int],
-	protocol: int
+	path: _typing.Union[_typing.AnyStr, _os.PathLike[_typing.AnyStr], None] = None,
+	domain: _typing.Union[_socket.AddressFamily, int] = _socket.AF_INET,
+	type: _typing.Union[_socket.SocketKind, int] = _socket.SOCK_STREAM,
+	protocol: int = 0
 ) -> _socket.socket:
 	bpath: _typing.Optional[bytes] = None
 	if path is not None:
