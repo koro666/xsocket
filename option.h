@@ -1,26 +1,26 @@
 #pragma once
 #include "cleanup.h"
 
-typedef uintptr_t xs_sw_bitarray;
+typedef uintptr_t xs_option_bitarray;
 
-struct xs_sw_optmap
+struct xs_option_map
 {
 	int level;
-	volatile xs_sw_bitarray* array;
+	volatile xs_option_bitarray* array;
 };
 
-#define XS_SW_MAXOPTNAME 256
-#define XS_SW_ARRINDBITS (sizeof(xs_sw_bitarray) * 8)
-#define XS_SW_OPTARRSIZE (XS_SW_MAXOPTNAME / XS_SW_ARRINDBITS)
+#define XS_OPTION_MAXNAME 256
+#define XS_OPTION_ARRBITS (sizeof(xs_option_bitarray) * 8)
+#define XS_OPTION_ARRSIZE (XS_OPTION_MAXNAME / XS_OPTION_ARRBITS)
 
-extern volatile xs_sw_bitarray sw_opt_socket[XS_SW_OPTARRSIZE];
-extern volatile xs_sw_bitarray sw_opt_ip[XS_SW_OPTARRSIZE];
-extern volatile xs_sw_bitarray sw_opt_ip6[XS_SW_OPTARRSIZE];
-extern volatile xs_sw_bitarray sw_opt_tcp[XS_SW_OPTARRSIZE];
-extern volatile xs_sw_bitarray sw_opt_udp[XS_SW_OPTARRSIZE];
-extern volatile socklen_t sw_optlen_max;
+extern volatile xs_option_bitarray xo_socket[XS_OPTION_ARRSIZE];
+extern volatile xs_option_bitarray xo_ip[XS_OPTION_ARRSIZE];
+extern volatile xs_option_bitarray xo_ip6[XS_OPTION_ARRSIZE];
+extern volatile xs_option_bitarray xo_tcp[XS_OPTION_ARRSIZE];
+extern volatile xs_option_bitarray xo_udp[XS_OPTION_ARRSIZE];
+extern volatile socklen_t xo_optlen_max;
 
-extern const struct xs_sw_optmap sw_optmap[];
+extern const struct xs_option_map xo_optmap[];
 
 typedef int (*setsockopt_fn)(int, int, int, const void*, socklen_t);
 
