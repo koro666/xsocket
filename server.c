@@ -3,8 +3,17 @@
 #include "socket.h"
 #include "protocol.h"
 
+#ifdef XSOCKET_SYSTEMD
+bool xs_journal;
+#endif
+
 int main(int argc, char** argv)
 {
+#ifdef XSOCKET_SYSTEMD
+	if ((xs_journal = xs_check_journal()))
+		sd_journal_send("PRIORITY=%d", LOG_DEBUG, NULL);
+#endif
+
 	sigset_t sigmask;
 	__attribute__((cleanup(xs_cleanup_restore)))
 	sigset_t* restore = NULL;
@@ -21,7 +30,7 @@ int main(int argc, char** argv)
 	if (!xs_setup_socket(argc, argv, &address, &srvfd, &path))
 		return EXIT_FAILURE;
 
-#if XSOCKET_SYSTEMD
+#ifdef XSOCKET_SYSTEMD
 	sd_notify(0, "READY=1");
 #endif
 
@@ -61,13 +70,73 @@ int main(int argc, char** argv)
 			return EXIT_FAILURE;
 	}
 
-#if XSOCKET_SYSTEMD
+#ifdef XSOCKET_SYSTEMD
 	if (parent)
 		sd_notify(0, "STOPPING=1");
 #endif
 
 	return !signo || signo == SIGTERM ? EXIT_SUCCESS : EXIT_FAILURE;
 }
+
+#ifdef XSOCKET_SYSTEMD
+bool xs_check_journal(void)
+{
+	const char* value = getenv("JOURNAL_STREAM");
+	if (!value || !*value)
+		return false;
+
+#ifdef _DEBUG
+	if (!strcmp(value, "*"))
+		return true;
+#endif
+
+	AUTO_FREE char* buffer = strdup(value);
+	char* separator = strchr(buffer, ':');
+	if (!separator)
+		return false;
+
+	*separator = 0;
+	const char *sdev = buffer, *sino = separator + 1;
+	if (!*sdev || !*sino)
+		return false;
+
+	char* endptr;
+	unsigned long long dev = strtoull(sdev, &endptr, 10);
+	if (*endptr)
+		return false;
+
+	unsigned long long ino = strtoull(sino, &endptr, 10);
+	if (*endptr)
+		return false;
+
+	struct stat st;
+	if (fstat(STDERR_FILENO, &st) < 0)
+		return false;
+
+	return st.st_dev == dev && st.st_ino == ino;
+}
+
+void xs_perror(const char* message)
+{
+	if (xs_journal)
+		sd_journal_perror(message);
+	else
+		perror(message);
+}
+
+void xs_printf(int priority, const char* format, ...)
+{
+	va_list ap;
+	va_start(ap, format);
+
+	if (xs_journal)
+		sd_journal_printv(priority, format, ap);
+	else
+		vfprintf(stderr, format, ap);
+
+	va_end(ap);
+}
+#endif
 
 bool xs_setup_signals(sigset_t* omask, sigset_t** prestore, fd_t* pfd)
 {
@@ -79,7 +148,7 @@ bool xs_setup_signals(sigset_t* omask, sigset_t** prestore, fd_t* pfd)
 
 	if (sigprocmask(SIG_BLOCK, &mask, omask) < 0)
 	{
-		perror("sigprocmask");
+		xs_perror("sigprocmask");
 		return false;
 	}
 
@@ -87,14 +156,14 @@ bool xs_setup_signals(sigset_t* omask, sigset_t** prestore, fd_t* pfd)
 
 	if (signal(SIGCHLD, SIG_IGN) == SIG_ERR)
 	{
-		perror("signal");
+		xs_perror("signal");
 		return false;
 	}
 
 	*pfd = signalfd(-1, &mask, SFD_CLOEXEC);
 	if (*pfd < 0)
 	{
-		perror("signalfd");
+		xs_perror("signalfd");
 		return false;
 	}
 
@@ -109,7 +178,7 @@ bool xs_setup_socket(int argc, char* const* argv, struct sockaddr_un* address, f
 	AUTO_CLOSE fd_t fd = socket(AF_UNIX, SOCK_SEQPACKET|SOCK_CLOEXEC, 0);
 	if (fd < 0)
 	{
-		perror("socket");
+		xs_perror("socket");
 		return false;
 	}
 
@@ -119,7 +188,7 @@ bool xs_setup_socket(int argc, char* const* argv, struct sockaddr_un* address, f
 
 	if (result < 0)
 	{
-		perror("bind");
+		xs_perror("bind");
 		return false;
 	}
 
@@ -129,13 +198,13 @@ bool xs_setup_socket(int argc, char* const* argv, struct sockaddr_un* address, f
 	int optval = 1;
 	if (setsockopt(fd, SOL_SOCKET, SO_PASSCRED, &optval, sizeof(optval)) < 0)
 	{
-		perror("setsockopt");
+		xs_perror("setsockopt");
 		return false;
 	}
 
 	if (listen(fd, 32) < 0)
 	{
-		perror("listen");
+		xs_perror("listen");
 		return false;
 	}
 
@@ -161,7 +230,7 @@ bool xs_poll_sockets(fd_t sigfd, fd_t srvfd, bool* psig, bool* prcvd)
 
 	if (result < 0)
 	{
-		perror("poll");
+		xs_perror("poll");
 		return false;
 	}
 
@@ -180,14 +249,14 @@ uint32_t xs_read_signal(fd_t sigfd)
 
 	if (size < 0)
 	{
-		perror("read");
+		xs_perror("read");
 		return 0;
 	}
 
 	if (size < sizeof(struct signalfd_siginfo))
 		return 0;
 
-	fprintf(stderr, "received signal %u\n", (unsigned int)fdsi.ssi_signo);
+	xs_printf(LOG_INFO, "received signal %u\n", (unsigned int)fdsi.ssi_signo);
 	return fdsi.ssi_signo;
 }
 
@@ -199,14 +268,14 @@ bool xs_split(fd_t srvfd, bool* pparent)
 
 	if (newfd < 0)
 	{
-		perror("accept4");
+		xs_perror("accept4");
 		return false;
 	}
 
 	pid_t pid = fork();
 	if (pid < 0)
 	{
-		perror("fork");
+		xs_perror("fork");
 		return false;
 	}
 
@@ -217,7 +286,7 @@ bool xs_split(fd_t srvfd, bool* pparent)
 
 	if (dup3(newfd, srvfd, O_CLOEXEC) < 0)
 	{
-		perror("dup3");
+		xs_perror("dup3");
 		return false;
 	}
 
@@ -234,7 +303,7 @@ bool xs_handle_request(fd_t srvfd, bool* peof)
 
 	if (received < 0)
 	{
-		perror("recv_packet");
+		xs_perror("recv_packet");
 		return false;
 	}
 
@@ -247,7 +316,7 @@ bool xs_handle_request(fd_t srvfd, bool* peof)
 
 	if (received < sizeof(request) || ntohl(request.signature) != XS_PROTOCOL_REQUEST)
 	{
-		fprintf(stderr, "truncated or invalid request: pid=%d, uid=%d, gid=%d\n", (int)cred.pid, (int)cred.uid, (int)cred.gid);
+		xs_printf(LOG_WARNING, "truncated or invalid request: pid=%d, uid=%d, gid=%d\n", (int)cred.pid, (int)cred.uid, (int)cred.gid);
 		return false;
 	}
 
@@ -255,7 +324,7 @@ bool xs_handle_request(fd_t srvfd, bool* peof)
 	int type = ntohl(request.type);
 	int protocol = ntohl(request.protocol);
 
-	fprintf(stderr, "socket request: domain=%d, type=%d, protocol=%d, pid=%d, uid=%d, gid=%d\n",
+	xs_printf(LOG_DEBUG, "socket request: domain=%d, type=%d, protocol=%d, pid=%d, uid=%d, gid=%d\n",
 		domain, type, protocol, (int)cred.pid, (int)cred.uid, (int)cred.gid);
 
 	AUTO_CLOSE fd_t newfd = -1;
@@ -266,7 +335,7 @@ bool xs_handle_request(fd_t srvfd, bool* peof)
 	if (newfd < 0)
 	{
 		error = errno;
-		perror("socket");
+		xs_perror("socket");
 	}
 
 	struct xs_protocol_response response =
@@ -278,7 +347,7 @@ bool xs_handle_request(fd_t srvfd, bool* peof)
 	ssize_t written = send_packet(srvfd, &response, sizeof(response), newfd);
 	if (written < 0)
 	{
-		perror("send_packet");
+		xs_perror("send_packet");
 		return false;
 	}
 

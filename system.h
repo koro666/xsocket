@@ -19,5 +19,6 @@
 #include <sys/un.h>
 #ifdef XSOCKET_SYSTEMD
 #include <systemd/sd-daemon.h>
+#include <systemd/sd-journal.h>
 #endif
 #include <unistd.h>

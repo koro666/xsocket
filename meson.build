@@ -30,7 +30,7 @@ if systemd.found()
 endif
 
 if libsystemd.found()
-	add_project_arguments('-DXSOCKET_SYSTEMD', language: 'c')
+	add_project_arguments('-DXSOCKET_SYSTEMD', '-DSD_JOURNAL_SUPPRESS_LOCATION', language: 'c')
 endif
 
 xsocket_common = static_library(
