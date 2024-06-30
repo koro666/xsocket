@@ -1,6 +1,47 @@
 #include "system.h"
 #include "socket.h"
 
+ssize_t parse_port_list(const char* value, in_port_t** ports)
+{
+	*ports = NULL;
+	if (!value || !*value)
+		return 0;
+
+	if (!strcmp(value, "*"))
+		return -1;
+
+	AUTO_FREE char* buffer = strdup(value);
+
+	size_t count = 0, capacity = 0;
+	in_port_t* array = NULL;
+
+	const char separator[] = " ";
+	char *token, *dummy;
+	for (token = strtok_r(buffer, separator, &dummy); token; token = strtok_r(NULL, separator, &dummy))
+	{
+		char* endptr;
+		unsigned long port = strtoul(token, &endptr, 10);
+		if (*endptr)
+			continue;
+		if (port <= 0 || port >= 0x10000)
+			continue;
+
+		if (count >= capacity)
+		{
+			capacity += 8;
+			array = realloc(array, capacity * sizeof(in_port_t));
+		}
+
+		array[count++] = port;
+	}
+
+	if (count < capacity)
+		array = realloc(array, count * sizeof(in_port_t));
+
+	*ports = array;
+	return count;
+}
+
 int check_socket(fd_t sockfd, int* domain, int* type, int* protocol)
 {
 	socklen_t length;

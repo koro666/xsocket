@@ -16,47 +16,7 @@ void xbind_initialize(void)
 {
 	const char* value = getenv("XSOCKET");
 	xsocket_address = value && *value ? strdup(value) : NULL;
-
-	value = getenv("XBIND");
-	if (!value || !*value)
-		return;
-
-	if (!strcmp(value, "*"))
-	{
-		xb_nport = -1;
-		return;
-	}
-
-	AUTO_FREE char* buffer = strdup(value);
-
-	size_t count = 0, capacity = 0;
-	in_port_t* ports = NULL;
-
-	const char* separator = " ";
-	char *token, *dummy;
-	for (token = strtok_r(buffer, separator, &dummy); token; token = strtok_r(NULL, separator, &dummy))
-	{
-		char* endptr;
-		unsigned long port = strtoul(token, &endptr, 10);
-		if (*endptr)
-			continue;
-		if (port <= 0 || port >= 0x10000)
-			continue;
-
-		if (count >= capacity)
-		{
-			capacity += 8;
-			ports = realloc(ports, capacity * sizeof(in_port_t));
-		}
-
-		ports[count++] = port;
-	}
-
-	if (count < capacity)
-		ports = realloc(ports, count * sizeof(in_port_t));
-
-	xb_ports = ports;
-	xb_nport = count;
+	xb_nport = parse_port_list(getenv("XBIND"), &xb_ports);
 }
 
 __attribute__((visibility("default")))
