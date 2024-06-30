@@ -2,7 +2,7 @@
 	"version": "0.2.0",
 	"configurations": [
 	{
-		"name": "Hook",
+		"name": "Hook (Bind)",
 		"type": "cppdbg",
 		"request": "launch",
 		"program": "/usr/bin/nc",
@@ -12,6 +12,19 @@
 			{ "name": "LD_PRELOAD", "value": "${workspaceFolder}/builddir/libxbind.so" },
 			{ "name": "XSOCKET", "value": "@xsocket" },
 			{ "name": "XBIND", "value": "3000" }
+		]
+	},
+	{
+		"name": "Hook (Connect)",
+		"type": "cppdbg",
+		"request": "launch",
+		"program": "/usr/bin/nc",
+		"args": ["-vv", "127.0.0.1", "3000"],
+		"cwd": "${workspaceFolder}",
+		"environment": [
+			{ "name": "LD_PRELOAD", "value": "${workspaceFolder}/builddir/libxconnect.so" },
+			{ "name": "XSOCKET", "value": "@xsocket" },
+			{ "name": "XCONNECT", "value": "3000" }
 		]
 	},
 	{

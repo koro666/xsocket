@@ -61,6 +61,13 @@ shared_library(
 	link_with: [xsocket_core, xsocket_hook, xsocket_library],
 	install: true)
 
+shared_library(
+	'xconnect',
+	'connect.c',
+	gnu_symbol_visibility: 'hidden',
+	link_with: [xsocket_core, xsocket_hook, xsocket_library],
+	install: true)
+
 executable(
 	'xsocket-server',
 	'server.c',
