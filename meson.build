@@ -37,6 +37,7 @@ xsocket_common = static_library(
 	'xsocket_common',
 	'cleanup.c',
 	'socket.c',
+	'address.c',
 	'protocol.c',
 	gnu_symbol_visibility: 'hidden')
 

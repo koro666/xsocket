@@ -13,6 +13,8 @@ source=(
 	'cleanup.h'
 	'socket.c'
 	'socket.h'
+	'address.c'
+	'address.h'
 	'protocol.c'
 	'protocol.h'
 	'xsocket.c'
@@ -30,6 +32,8 @@ source=(
 	'xsocket.py'
 )
 sha256sums=(
+	'SKIP'
+	'SKIP'
 	'SKIP'
 	'SKIP'
 	'SKIP'

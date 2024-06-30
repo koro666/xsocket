@@ -1,7 +1,7 @@
 #include "system.h"
 #include "hook.h"
 #include "cleanup.h"
-#include "socket.h"
+#include "address.h"
 #include "protocol.h"
 #include "xsocket.h"
 #include "switch.h"
