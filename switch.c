@@ -1,18 +1,42 @@
 #include "system.h"
 #include "switch.h"
+#include "cleanup.h"
+#include "address.h"
 #include "option.h"
+#include "xsocket.h"
 
-bool switcheroo(fd_t oldfd, fd_t newfd)
+int check_try_switch(const char* server, fd_t sockfd, const struct sockaddr* address, socklen_t addrlen, const in_port_t* ports, ssize_t nports)
 {
-	if (copysockopt(oldfd, newfd) < 0)
-		return false;
+	int domain, type, protocol;
+	int check = check_socket(sockfd, &domain, &type, &protocol);
+	if (check <= 0)
+		return check;
 
-	int flags = fcntl(oldfd, F_GETFD, 0);
+	if (!check_address(address, addrlen, ports, nports))
+		return 0;
+
+	type |= SOCK_CLOEXEC;
+
+	int flags = fcntl(sockfd, F_GETFL, 0);
 	if (flags < 0)
-		return false;
+		return -1;
 
-	if (dup3(newfd, oldfd, flags & FD_CLOEXEC ? O_CLOEXEC : 0) < 0)
-		return false;
+	if (flags & O_NONBLOCK)
+		type |= SOCK_NONBLOCK;
 
-	return true;
+	AUTO_CLOSE fd_t newfd = xsocket(server, domain, type, protocol);
+	if (newfd < 0)
+		return -1;
+
+	if (copysockopt(sockfd, newfd) < 0)
+		return -1;
+
+	flags = fcntl(sockfd, F_GETFD, 0);
+	if (flags < 0)
+		return -1;
+
+	if (dup3(newfd, sockfd, flags & FD_CLOEXEC ? O_CLOEXEC : 0) < 0)
+		return -1;
+
+	return 1;
 }

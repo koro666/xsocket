@@ -2,7 +2,6 @@
 #include "hook.h"
 #include "cleanup.h"
 #include "address.h"
-#include "protocol.h"
 #include "xsocket.h"
 #include "switch.h"
 
@@ -22,31 +21,9 @@ void xbind_initialize(void)
 __attribute__((visibility("default")))
 int bind(fd_t sockfd, const struct sockaddr* address, socklen_t addrlen)
 {
-	int domain, type, protocol;
-	int check = check_socket(sockfd, &domain, &type, &protocol);
-	if (check < 0)
+	if (check_try_switch(xsocket_address, sockfd, address, addrlen, xb_ports, xb_nport) < 0)
 		return -1;
 
-	if (!check || !check_address(address, addrlen, xb_ports, xb_nport))
-		return xbind_forward(sockfd, address, addrlen);
-
-	type |= SOCK_CLOEXEC;
-
-	int flags = fcntl(sockfd, F_GETFL, 0);
-	if (flags < 0)
-		return -1;
-
-	if (flags & O_NONBLOCK)
-		type |= SOCK_NONBLOCK;
-
-	AUTO_CLOSE fd_t newfd = xsocket(xsocket_address, domain, type, protocol);
-	if (newfd < 0)
-		return -1;
-
-	if (!switcheroo(sockfd, newfd))
-		return -1;
-
-	close_p(&newfd);
 	return xbind_forward(sockfd, address, addrlen);
 }
 
