@@ -1,5 +1,5 @@
 pkgname='xsocket'
-pkgver=1.1
+pkgver=1.2
 pkgrel=1
 pkgdesc='Cross-namespace socket library'
 arch=('x86_64' 'i686' 'aarch64' 'armv7h')
