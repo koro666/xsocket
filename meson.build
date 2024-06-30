@@ -33,28 +33,32 @@ if libsystemd.found()
 	add_project_arguments('-DXSOCKET_SYSTEMD', language: 'c')
 endif
 
-xsocket_common = static_library(
-	'xsocket_common',
+xsocket_core = static_library(
+	'xsocket_core',
 	'cleanup.c',
 	'socket.c',
-	'address.c',
 	'protocol.c',
+	gnu_symbol_visibility: 'hidden')
+
+xsocket_hook = static_library(
+	'xsocket_hook',
+	'address.c',
+	'option.c',
+	'switch.c',
 	gnu_symbol_visibility: 'hidden')
 
 xsocket_library = shared_library(
 	'xsocket',
 	'xsocket.c',
 	gnu_symbol_visibility: 'hidden',
-	link_with: xsocket_common,
+	link_with: xsocket_core,
 	install: true)
 
 shared_library(
 	'xbind',
 	'hook.c',
-	'option.c',
-	'switch.c',
 	gnu_symbol_visibility: 'hidden',
-	link_with: [xsocket_common, xsocket_library],
+	link_with: [xsocket_core, xsocket_hook, xsocket_library],
 	install: true)
 
 executable(
@@ -62,7 +66,7 @@ executable(
 	'server.c',
 	dependencies: libsystemd,
 	gnu_symbol_visibility: 'hidden',
-	link_with: xsocket_common,
+	link_with: xsocket_core,
 	install: true)
 
 if python.found() and python.language_version().version_compare('>=3.12')
