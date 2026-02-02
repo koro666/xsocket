@@ -1,6 +1,6 @@
 pkgname='xsocket'
 pkgver=1.2
-pkgrel=2
+pkgrel=3
 pkgdesc='Cross-namespace socket library'
 arch=('x86_64' 'i686' 'aarch64' 'armv7h')
 url='https://github.com/koro666/xsocket'
